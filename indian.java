@@ -91,18 +91,6 @@ public class KnowledgeClass {
         else
             decision = "c";
 
-        // 相手がブラフを多用する場合、高いビッドを信じずにコール
-        int bluffCount = 0;
-        for (int i = 0; i < history.length; i++) {
-            if (history[i].opponent_bid > 5 && history[i].opponent_card < 5) {
-                bluffCount++;
-            }
-        }
-        if (bluffCount > 3) {
-            // 相手がブラフを多用している場合、相手のビッドを信じずにコール
-            decision = "c";
-        }
-
         // 返り値は String クラスで
         return decision;
     }
