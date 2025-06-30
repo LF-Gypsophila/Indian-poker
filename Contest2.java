@@ -15,14 +15,11 @@ public class KnowledgeClass {
     int gameCount = 0;
 
     // --- 新たな作戦管理 ---
-    // enum StrategyType { NORMAL, STRATEGY_A, STRATEGY_B }
-    // StrategyType strategyType = StrategyType.NORMAL;
-    // enumを使わずintで管理
-    // 0: NORMAL, 1: STRATEGY_A, 2: STRATEGY_B
+    // 0: STRATEGY_POWER, 1: STRATEGY_DEFENCE, 2: STRATEGY_BALANCE
     int strategyType = 0;
-    static final int STRATEGY_NORMAL = 0;
-    static final int STRATEGY_A = 1;
-    static final int STRATEGY_B = 2;
+    static final int STRATEGY_POWER = 0;
+    static final int STRATEGY_DEFENCE = 1;
+    static final int STRATEGY_BALANCE = 2;
 
     KnowledgeClass() {
         for (int i = 0; i < history.length; i++) {
@@ -40,13 +37,13 @@ public class KnowledgeClass {
     }
 
     // --- 戦略切り替え判定 ---
-    // ・最初の200回は作戦Aを使用
-    // ・相手のベット1が40％に満たないなら、通常の作戦
-    // ・相手のベット1が40%を超えており、かつ2より5ベットのほうが多いなら作戦A
-    // ・相手のベット1が40%超えており、かつ5ベットより2ベットのほうがおおいなら作戦B
+    // ・最初の200回はDEFENCEを使用
+    // ・相手のベット1が40％に満たないなら、POWER
+    // ・相手のベット1が40%を超えており、かつ2より5ベットのほうが多いならDEFENCE
+    // ・相手のベット1が40%超えており、かつ5ベットより2ベットのほうがおおいならBALANCE
     private void checkStrategyType() {
         if (gameCount < 200) {
-            strategyType = STRATEGY_A;
+            strategyType = STRATEGY_DEFENCE;
             return;
         }
 
@@ -63,12 +60,12 @@ public class KnowledgeClass {
         double rate1 = (checkRange > 0) ? (double)count1 / checkRange : 0.0;
 
         if (rate1 < 0.4) {
-            strategyType = STRATEGY_NORMAL;
+            strategyType = STRATEGY_POWER;
         } else {
             if (count5 > count2) {
-                strategyType = STRATEGY_A;
+                strategyType = STRATEGY_DEFENCE;
             } else {
-                strategyType = STRATEGY_B;
+                strategyType = STRATEGY_BALANCE;
             }
         }
     }
@@ -86,8 +83,8 @@ public class KnowledgeClass {
         int b = 1; // デフォルトは1ドル
 
         switch (strategyType) {
-            case STRATEGY_A:
-                // 戦略A:
+            case STRATEGY_DEFENCE:
+                // ディフェンス型:
                 //　2以上4以下には2をかけて5以上には1 
                 if (current.opponent_card >= 2 && current.opponent_card <= 4) {
                     b = 2;
@@ -95,8 +92,8 @@ public class KnowledgeClass {
                     b = 1;
                 }
                 break;
-            case STRATEGY_B:
-                // 戦略B:
+            case STRATEGY_BALANCE:
+                // バランス型:
                 // 2,3のとき5ベット
                 if (current.opponent_card == 2 || current.opponent_card == 3) {
                     b = 5;
@@ -118,9 +115,9 @@ public class KnowledgeClass {
                     b = 1;
                 }
                 break;
-            case STRATEGY_NORMAL:
+            case STRATEGY_POWER:
             default:
-                // 通常作戦
+                // パワー型
                 if (current.opponent_card >= 2 && current.opponent_card <= 5) {
                     b = 5;
                 } else {
